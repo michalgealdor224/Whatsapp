@@ -19,6 +19,8 @@ public class OpenWindow extends JPanel {
     private TextField textToSend;
     private JLabel enterText;
     private boolean trySend = true;
+    private boolean trySend2 = true;
+
 
 
 
@@ -83,7 +85,7 @@ public class OpenWindow extends JPanel {
                       //  }
                  //   }
                /// }
-                JOptionPane.showMessageDialog(null,"ההתחברות בוצעה בהצלחה (:","title",JOptionPane.INFORMATION_MESSAGE);
+                //JOptionPane.showMessageDialog(null,"ההתחברות בוצעה בהצלחה (:","title",JOptionPane.INFORMATION_MESSAGE);
 
                 AtomicBoolean valid= new AtomicBoolean(false);
                 button.addActionListener( (event1) -> {
@@ -121,11 +123,60 @@ public class OpenWindow extends JPanel {
                       driver.manage().window().maximize();
                       driver.get("https://web.whatsapp.com/send?phone=" + finalNumber);
                       driver.manage().window().maximize();
-                       sendMessage(driver,text);
+                      // sendMessage(driver,text);
+                      while (trySend) {
+                          try {
+                              WebElement userName = driver.findElement(By.cssSelector("div[title=\"הקלדת ההודעה\"]"));
+                              userName.sendKeys(text);
+                              trySend = false;
+                          } catch (Exception ignored) {
+                          }
+                      }
+                      while (!trySend) {
+                          try {
+                              WebElement send = driver.findElement(By.xpath("//*[@id=\"main\"]/footer/div[1]/div/span[2]/div/div[2]/div[2]/button"));
+                              send.click();
+                              //  JOptionPane.showMessageDialog(null,"ההודעה נשלחה בהצלחה (:","title",JOptionPane.INFORMATION_MESSAGE);
+                              trySend = true;
+                          } catch (Exception ignored) {
+
+                          }
+                      }
+                      boolean flag = true;
+                      while (flag) {
+                          List<WebElement> webElement = driver.findElements(By.cssSelector("div[class=\"_1Gy50\"]"));
+                          for (int i = 0; i < webElement.size(); i++) {
+                              //  System.out.println(webElement.get(i).getText());
+                              //    System.out.println(webElement.get(webElement.size()-1).getText());
+                              if (Objects.equals(webElement.get(i).getText(), text)) {
+                                  System.out.println("i do-------");
+                                  try {
+
+                                      WebElement vi1 = driver.findElement(By.cssSelector("span[aria-label=\" נשלחה \"]"));
+                                      if (vi1.isDisplayed()) {
+                                          System.out.println("yes");
+                                          //flag =false;
+                                      }
+                                      WebElement vi2 = driver.findElement(By.cssSelector("span[aria-label=\" נמסרה \"]"));
+                                      if (vi2.isDisplayed()) {
+                                          System.out.println("very");
+                                          //flag =false;
+                                      }
+                                      WebElement blueVi = driver.findElement(By.cssSelector("span[aria-label=\" נקראה \"]"));
+                                      if (blueVi.isDisplayed()) {
+                                          System.out.println("good");
+                                          flag = false;
+                                      }
 
 
-                  }
+                                  } catch (Exception exception) {
+                                      System.out.println(".");
+                                  }
+                              }
+                          }
+                      }
 
+                          }
                 });
             });thread.start();
 

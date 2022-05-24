@@ -145,38 +145,35 @@ public class OpenWindow extends JPanel {
                       boolean flag = true;
                       while (flag) {
                           List<WebElement> webElement = driver.findElements(By.cssSelector("div[class=\"_1Gy50\"]"));
-                          for (int i = 0; i < webElement.size(); i++) {
-                              //  System.out.println(webElement.get(i).getText());
-                              //    System.out.println(webElement.get(webElement.size()-1).getText());
-                              if (Objects.equals(webElement.get(i).getText(), text)) {
-                                  System.out.println("i do-------");
-                                  try {
-
-                                      WebElement vi1 = driver.findElement(By.cssSelector("span[aria-label=\" נשלחה \"]"));
-                                      if (vi1.isDisplayed()) {
-                                          System.out.println("yes");
-                                          //flag =false;
-                                      }
-                                      WebElement vi2 = driver.findElement(By.cssSelector("span[aria-label=\" נמסרה \"]"));
-                                      if (vi2.isDisplayed()) {
-                                          System.out.println("very");
-                                          //flag =false;
-                                      }
-                                      WebElement blueVi = driver.findElement(By.cssSelector("span[aria-label=\" נקראה \"]"));
-                                      if (blueVi.isDisplayed()) {
-                                          System.out.println("good");
-                                          flag = false;
-                                      }
-
-
-                                  } catch (Exception exception) {
-                                      System.out.println(".");
+                          if (Objects.equals(webElement.get(webElement.size() - 1).getText(), text)) {
+                              try {
+                                  WebElement what = driver.findElement(By.xpath("//*[@id=\"main\"]/div[3]/div/div[2]/div[3]/div[192]/div/div[1]/div[1]/div[1]/div/span[1]/span"));
+                                  WebElement vi1 = driver.findElement(By.cssSelector("span[aria-label=\" נשלחה \"]"));
+                                  if (vi1.isDisplayed() ) {
+                                      System.out.println("yes");
+                                      // flag =false;
                                   }
+                                  WebElement vi2 = driver.findElement(By.cssSelector("span[aria-label=\" נמסרה \"]"));
+                                  if (vi2.isDisplayed()) {
+                                      System.out.println("very");
+                                      flag = false;
+                                  }
+                                  WebElement blueVi = driver.findElement(By.cssSelector("span[aria-label=\" נקראה \"]"));
+                                  //     if (blueVi.isDisplayed()) {
+                                  //       System.out.println("good");
+                                  //     flag = false;
+                                  //   }
+
+
+                              } catch (Exception exception) {
+                                  System.out.println(".");
                               }
                           }
                       }
-
                           }
+
+
+                        //  }
                 });
             });thread.start();
 

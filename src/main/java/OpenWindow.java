@@ -18,6 +18,7 @@ public class OpenWindow extends JPanel {
     private JLabel enterNumber;
     private TextField textToSend;
     private JLabel enterText;
+    private ChromeDriver driver;
     private boolean trySend = true;
     private boolean trySend2 = true;
 
@@ -78,103 +79,124 @@ public class OpenWindow extends JPanel {
             };
             Thread thread = new Thread( () -> {
                 // while (!ref.flag) {
-                  //  List<WebElement> elementList = driver.findElements(By.linkText("ניתן להוריד אותה כאן"));
+                //  List<WebElement> elementList = driver.findElements(By.linkText("ניתן להוריד אותה כאן"));
                 //    for (int i = 0; i < elementList.size(); i++) {
-                  //      if (elementList.get(i).isDisplayed()) {
-                    //        ref.flag =true;
-                      //  }
-                 //   }
-               /// }
+                //      if (elementList.get(i).isDisplayed()) {
+                //        ref.flag =true;
+                //  }
+                //   }
+                /// }
                 //JOptionPane.showMessageDialog(null,"ההתחברות בוצעה בהצלחה (:","title",JOptionPane.INFORMATION_MESSAGE);
 
-                AtomicBoolean valid= new AtomicBoolean(false);
-                button.addActionListener( (event1) -> {
+                AtomicBoolean valid = new AtomicBoolean(false);
+                button.addActionListener((event1) -> {
 
                     String number = phoneNumber.getText();
-                   String text = textToSend.getText();
-                   if (Objects.equals(number, "")) {
-                       JOptionPane.showMessageDialog(null,"not have number","title",JOptionPane.ERROR_MESSAGE);
-                       valid.set(false);
+                    String text = textToSend.getText();
+                    if (Objects.equals(number, "")) {
+                        JOptionPane.showMessageDialog(null, "not have number", "title", JOptionPane.ERROR_MESSAGE);
+                        valid.set(false);
 
-                   }
-                   if (!ifValid(number)) {
-                       JOptionPane.showMessageDialog(null,"Invalid number","title",JOptionPane.ERROR_MESSAGE);
-                       valid.set(false);
+                    }
+                    if (!ifValid(number)) {
+                        JOptionPane.showMessageDialog(null, "Invalid number", "title", JOptionPane.ERROR_MESSAGE);
+                        valid.set(false);
 
-                   }
-                  if (Objects.equals(text, ""))  {
-                      JOptionPane.showMessageDialog(null,"No text entered","title",JOptionPane.ERROR_MESSAGE);
-                      valid.set(false);
+                    }
+                    if (Objects.equals(text, "")) {
+                        JOptionPane.showMessageDialog(null, "No text entered", "title", JOptionPane.ERROR_MESSAGE);
+                        valid.set(false);
 
-                  }
-                  if (number.charAt(0) == '0') {
-                      number = "972"+number.substring(1,number.length());
-                      valid.set(true);
-                  }
-                  if (ifValid(number)){
-                      valid.set(true);
-                  }
+                    }
+                    if (number.charAt(0) == '0') {
+                        number = "972" + number.substring(1, number.length());
+                        valid.set(true);
+                    }
+                    if (ifValid(number)) {
+                        valid.set(true);
+                    }
 
-                  if (valid.get()) {
-                      String finalNumber = number;
-                      System.setProperty("webdriver.chrome.driver", "C:\\Users\\USER\\Downloads\\chromedriver_win32\\chromedriver.exe");
-                      ChromeOptions chromeOptions = new ChromeOptions();
-                      ChromeDriver driver = new ChromeDriver(chromeOptions);
-                      driver.manage().window().maximize();
-                      driver.get("https://web.whatsapp.com/send?phone=" + finalNumber);
-                      driver.manage().window().maximize();
-                      // sendMessage(driver,text);
-                      while (trySend) {
-                          try {
-                              WebElement userName = driver.findElement(By.cssSelector("div[title=\"הקלדת ההודעה\"]"));
-                              userName.sendKeys(text);
-                              trySend = false;
-                          } catch (Exception ignored) {
-                          }
-                      }
-                      while (!trySend) {
-                          try {
-                              WebElement send = driver.findElement(By.xpath("//*[@id=\"main\"]/footer/div[1]/div/span[2]/div/div[2]/div[2]/button"));
-                              send.click();
-                              //  JOptionPane.showMessageDialog(null,"ההודעה נשלחה בהצלחה (:","title",JOptionPane.INFORMATION_MESSAGE);
-                              trySend = true;
-                          } catch (Exception ignored) {
+                    if (valid.get()) {
+                        String finalNumber = number;
+                        System.setProperty("webdriver.chrome.driver", "C:\\Users\\USER\\Downloads\\chromedriver_win32\\chromedriver.exe");
+                        ChromeOptions chromeOptions = new ChromeOptions();
+                        driver = new ChromeDriver(chromeOptions);
+                        driver.manage().window().maximize();
+                        driver.get("https://web.whatsapp.com/send?phone=" + finalNumber);
+                        driver.manage().window().maximize();
+                        // sendMessage(driver,text);
+                        while (trySend) {
+                            try {
+                                WebElement userName = driver.findElement(By.cssSelector("div[title=\"הקלדת ההודעה\"]"));
+                                userName.sendKeys(text);
+                                trySend = false;
+                            } catch (Exception ignored) {
+                            }
+                        }
+                        while (!trySend) {
+                            try {
+                                WebElement send = driver.findElement(By.xpath("//*[@id=\"main\"]/footer/div[1]/div/span[2]/div/div[2]/div[2]/button"));
+                                send.click();
+                                //  JOptionPane.showMessageDialog(null,"ההודעה נשלחה בהצלחה (:","title",JOptionPane.INFORMATION_MESSAGE);
+                                trySend = true;
+                            } catch (Exception ignored) {
 
-                          }
-                      }
-                      boolean flag = true;
-                      while (flag) {
-                          List<WebElement> webElement = driver.findElements(By.cssSelector("div[class=\"_1Gy50\"]"));
-                          if (Objects.equals(webElement.get(webElement.size() - 1).getText(), text)) {
-                              try {
-                                  WebElement what = driver.findElement(By.xpath("//*[@id=\"main\"]/div[3]/div/div[2]/div[3]/div[192]/div/div[1]/div[1]/div[1]/div/span[1]/span"));
-                                  WebElement vi1 = driver.findElement(By.cssSelector("span[aria-label=\" נשלחה \"]"));
-                                  if (vi1.isDisplayed() ) {
-                                      System.out.println("yes");
-                                      // flag =false;
-                                  }
-                                  WebElement vi2 = driver.findElement(By.cssSelector("span[aria-label=\" נמסרה \"]"));
-                                  if (vi2.isDisplayed()) {
-                                      System.out.println("very");
-                                      flag = false;
-                                  }
-                                  WebElement blueVi = driver.findElement(By.cssSelector("span[aria-label=\" נקראה \"]"));
-                                  //     if (blueVi.isDisplayed()) {
-                                  //       System.out.println("good");
-                                  //     flag = false;
-                                  //   }
+                            }
+                        }
+                        AtomicBoolean flag = new AtomicBoolean(true);
+                        new Thread(() -> {
+                            while (flag.get()) {
+                                try {
+
+                                    WebElement chat = this.driver.findElement(By.className("_33LGR"));
+                                    WebElement chatBody = chat.findElement(By.cssSelector("div[tabindex='-1'][class='_3K4-L']"));
+                                    List<WebElement> allMessage = chatBody.findElements(By.className("_22Msk"));
+                                    WebElement lastMessage = allMessage.get(allMessage.size() - 1);
+
+                                    System.out.println(lastMessage);
+                                    WebElement status = lastMessage.findElement(By.cssSelector("span[data-testid='msg-dblcheck']"));
+                                    String statusMessage = status.getAttribute("aria-label");
+                                    System.out.println(statusMessage);
+                                    Thread.sleep(50000);
+
+                                    if (statusMessage.equals(" נשלחה ")) {
+                                        System.out.println("נשלחה");
+
+                                        flag.set(false);
+                                    }
+
+                                } catch (Exception e) {
+                                    System.out.println(".");
+
+                                }
+                            }
+                        }).start();
 
 
-                              } catch (Exception exception) {
-                                  System.out.println(".");
-                              }
-                          }
-                      }
-                          }
+                        //                 try {
+                        //                   WebElement vi1 = driver.findElement(By.cssSelector("span[aria-label=\" נשלחה \"]"));
+                        //                 System.out.println(vi1.getText() + "---");
+                        //               if (vi1.isDisplayed()  ) {
+                        //                 System.out.println("yes");
+                        // flag =false;
+                        //           }
+                        //         WebElement vi2 = driver.findElement(By.cssSelector("span[aria-label=\" נמסרה \"]"));
+                        //       if (vi2.isDisplayed()) {
+                        //         System.out.println("very");
+                        //       // flag.set(false);
+                        // }
+                        //      WebElement blueVi = driver.findElement(By.cssSelector("span[aria-label=\" נקראה \"]"));
+                        //     if (blueVi.isDisplayed()) {
+                        //       System.out.println("good");
+                        //     flag = false;
+                        //
+                        //
+                        //   }
 
 
-                        //  }
+                    }
                 });
+
             });thread.start();
 
 

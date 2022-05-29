@@ -19,6 +19,10 @@ public class OpenWindow extends JPanel {
     private TextField textToSend;
     private JLabel enterText;
     private ChromeDriver driver;
+    private JLabel vi1;
+    private JLabel vi2;
+    private JLabel blueVi;
+
     private boolean trySend = true;
     private boolean trySend2 = true;
 
@@ -56,10 +60,24 @@ public class OpenWindow extends JPanel {
             this.textToSend.setBounds(300,320,100,50);
             this.confirm = new JButton("אישור");
             this.confirm.setBounds(300,380,70,40);
+            this.vi2 = new JLabel("VV");
+            this.vi2.setBackground(Color.black);
+            this.vi2.setBounds(300,380,70,40);
+            this.vi2.setFont(new Font("TimesRoman", Font.BOLD, 15));
+            this.vi1 = new JLabel("סטטוס");
+            this.vi1.setBackground(Color.black);
+            this.vi1.setBounds(300,380,70,40);
+            this.vi1.setFont(new Font("TimesRoman", Font.BOLD, 15));
+            this.blueVi = new JLabel("VV");
+            this.blueVi.setBackground(Color.blue);
+            this.blueVi.setForeground(Color.blue);
+            this.blueVi.setBounds(300,380,70,40);
+            this.blueVi.setFont(new Font("TimesRoman", Font.BOLD, 15));
             add(phoneNumber);
             add(enterNumber);
             add(enterText);
             add(textToSend);
+            add(vi1);
             //add(confirm);
 
 
@@ -143,25 +161,45 @@ public class OpenWindow extends JPanel {
 
                             }
                         }
+                        WebElement chat = this.driver.findElement(By.className("_33LGR"));
+                        WebElement chatBody = chat.findElement(By.cssSelector("div[tabindex='-1'][class='_3K4-L']"));
+                        List<WebElement> allMessage = chatBody.findElements(By.className("_22Msk"));
+                        WebElement lastMessage = allMessage.get(allMessage.size() - 1);
                         AtomicBoolean flag = new AtomicBoolean(true);
+                        var ref1 = new Object() {
+                            boolean ifSend = false;
+                        };
                         new Thread(() -> {
+                            WebElement status;
+                            String statusMessage= " ";
+                            boolean ifSend = false;
                             while (flag.get()) {
                                 try {
+                                    if (!ifSend){
+                                         status = lastMessage.findElement(By.cssSelector("span[data-testid='msg-check']"));
+                                         statusMessage = status.getAttribute("aria-label");
+                                        if (statusMessage.equals(" נשלחה ")) {
+                                            System.out.println("נשלחה");
+                                            vi1.setText("V");
+                                            repaint();
+                                            ifSend = true;
+                                        }
+                                    }
+                                    status = lastMessage.findElement(By.cssSelector("span[data-testid='msg-dblcheck']"));
+                                    statusMessage = status.getAttribute("aria-label");
 
-                                    WebElement chat = this.driver.findElement(By.className("_33LGR"));
-                                    WebElement chatBody = chat.findElement(By.cssSelector("div[tabindex='-1'][class='_3K4-L']"));
-                                    List<WebElement> allMessage = chatBody.findElements(By.className("_22Msk"));
-                                    WebElement lastMessage = allMessage.get(allMessage.size() - 1);
+                                    //Thread.sleep(50000);
 
-                                    System.out.println(lastMessage);
-                                    WebElement status = lastMessage.findElement(By.cssSelector("span[data-testid='msg-dblcheck']"));
-                                    String statusMessage = status.getAttribute("aria-label");
-                                    System.out.println(statusMessage);
-                                    Thread.sleep(50000);
-
-                                    if (statusMessage.equals(" נשלחה ")) {
-                                        System.out.println("נשלחה");
-
+                                    if (statusMessage.equals(" נמסרה ")) {
+                                        System.out.println("נמסרה");
+                                        vi1.setText("VV");
+                                        repaint();
+                                    }
+                                    if (statusMessage.equals(" נקראה ")) {
+                                        System.out.println("נקראה");
+                                        vi1.setText("VV");
+                                        vi1.setForeground(Color.blue);
+                                        repaint();
                                         flag.set(false);
                                     }
 
@@ -170,28 +208,13 @@ public class OpenWindow extends JPanel {
 
                                 }
                             }
+                            WebElement comment = driver.findElement(By.xpath("//*[@id=\"main\"]/div[3]/div/div[2]/div[3]/div[47]/div/div[1]/div[1]/div[1]/div/span[1]/span"));
+                            System.out.println(comment.getText());
                         }).start();
 
 
-                        //                 try {
-                        //                   WebElement vi1 = driver.findElement(By.cssSelector("span[aria-label=\" נשלחה \"]"));
-                        //                 System.out.println(vi1.getText() + "---");
-                        //               if (vi1.isDisplayed()  ) {
-                        //                 System.out.println("yes");
-                        // flag =false;
-                        //           }
-                        //         WebElement vi2 = driver.findElement(By.cssSelector("span[aria-label=\" נמסרה \"]"));
-                        //       if (vi2.isDisplayed()) {
-                        //         System.out.println("very");
-                        //       // flag.set(false);
-                        // }
-                        //      WebElement blueVi = driver.findElement(By.cssSelector("span[aria-label=\" נקראה \"]"));
-                        //     if (blueVi.isDisplayed()) {
-                        //       System.out.println("good");
-                        //     flag = false;
-                        //
-                        //
-                        //   }
+
+
 
 
                     }
@@ -200,6 +223,14 @@ public class OpenWindow extends JPanel {
             });thread.start();
 
 
+    }
+    public Component printVi (Color color, String vi){
+        JLabel label = new JLabel(vi);
+        label.setBackground(color);
+        this.blueVi.setBounds(300,380,70,40);
+        this.blueVi.setFont(new Font("TimesRoman", Font.BOLD, 15));
+
+        return label;
     }
 
     public void sendMessage(ChromeDriver driver, String message){

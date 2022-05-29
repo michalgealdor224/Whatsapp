@@ -5,6 +5,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -116,25 +117,25 @@ public class OpenWindow extends JPanel {
                         var ref = new Object() {
                             boolean ifHave = false;
                         };
-                        Thread errorT = new Thread(() ->{
-                            while (!ref.ifHave)
-                            try {
-                                WebElement error = driver.findElement(By.className("_2Nr6U"));
-                                if (error.isDisplayed()){
-                                    System.out.println("error");
-                                    ref.ifHave =true;
-                                    WebElement clickError = driver.findElement(By.cssSelector("div[role='button'][tabindex='0']"));
-                                    clickError.click();
-                                    add(this.error);
-                                    repaint();
+                      //  Thread errorT = new Thread(() ->{
+                        //    while (!ref.ifHave)
+                          //  try {
+                            //    WebElement error = driver.findElement(By.className("_2Nr6U"));
+                              //  if (error.isDisplayed()){
+                                //    System.out.println("error");
+                                  //  ref.ifHave =true;
+                       //             WebElement clickError = driver.findElement(By.cssSelector("div[role='button'][tabindex='0']"));
+                         //           clickError.click();
+                                    //add(this.error);
+                           //         repaint();
 
-                                }
+                             //   }
 
-                            } catch (Exception e){
+                         //   } catch (Exception e){
 
-                            }
+//                            }
 
-                        });errorT.start();
+  //                      });errorT.start();
 
 
                         while (trySend) {
@@ -205,10 +206,16 @@ public class OpenWindow extends JPanel {
                                 while (true){
                                     List <WebElement> comment = driver.findElements(By.cssSelector("div[tabindex = '-1'][role = 'region']"));
                                     for (int i=0; i< comment.size(); i++){
-                                        String mes = comment.get(i).getText();
-                                        mes.split("הודעה 1 שלא נקראה");
-                                        System.out.println(mes);
-                                        System.out.println(comment.get(i).getText()+  "i:" +i + "size:" + comment.size());
+                                         List<String > mes = Collections.singletonList(comment.get(i).getText());
+                                      List<String>m = List.of(mes.get(0).split(" שלא "));
+                                      if (m.size() > 1) {
+                                          System.out.println(m.get(1) + "ההודעה האחרונה");
+                                      }
+                                        for (int j=0; j<m.size(); j++) {
+                                            System.out.println(m.get(j)+ " " + j + " " + " good");
+                                        }
+                                   //     System.out.println(mes);
+                                     //   System.out.println(comment.get(i).getText());
                                         String last = comment.get(comment.size()-1).getAttribute("aria-label");
                                       //  System.out.println(last);
                                         Thread.sleep(10000);

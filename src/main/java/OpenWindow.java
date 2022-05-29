@@ -14,17 +14,15 @@ public class OpenWindow extends JPanel {
     private ImageIcon background;
     private JLabel succeedToEnter;
     private TextField phoneNumber;
-    private JButton confirm;
     private JLabel enterNumber;
     private TextField textToSend;
     private JLabel enterText;
     private ChromeDriver driver;
-    private JLabel vi1;
-    private JLabel vi2;
-    private JLabel blueVi;
+    private JLabel vi;
+    private JLabel error;
+
 
     private boolean trySend = true;
-    private boolean trySend2 = true;
 
 
 
@@ -58,52 +56,24 @@ public class OpenWindow extends JPanel {
             this.enterText.setFont(new Font("TimesRoman", Font.BOLD, 15));
             this.textToSend = new TextField();
             this.textToSend.setBounds(300,320,100,50);
-            this.confirm = new JButton("אישור");
-            this.confirm.setBounds(300,380,70,40);
-            this.vi2 = new JLabel("VV");
-            this.vi2.setBackground(Color.black);
-            this.vi2.setBounds(300,380,70,40);
-            this.vi2.setFont(new Font("TimesRoman", Font.BOLD, 15));
-            this.vi1 = new JLabel("סטטוס");
-            this.vi1.setBackground(Color.black);
-            this.vi1.setBounds(300,380,70,40);
-            this.vi1.setFont(new Font("TimesRoman", Font.BOLD, 15));
-            this.blueVi = new JLabel("VV");
-            this.blueVi.setBackground(Color.blue);
-            this.blueVi.setForeground(Color.blue);
-            this.blueVi.setBounds(300,380,70,40);
-            this.blueVi.setFont(new Font("TimesRoman", Font.BOLD, 15));
+            this.vi = new JLabel("סטטוס");
+            this.vi.setBounds(300,380,70,40);
+            this.vi.setFont(new Font("TimesRoman", Font.BOLD, 15));
+            this.error = new JLabel("מספר הטלפון אינו תקין");
+            this.error.setBounds(350,380,70,40);
+            this.error.setFont(new Font("TimesRoman", Font.BOLD, 15));
             add(phoneNumber);
             add(enterNumber);
             add(enterText);
             add(textToSend);
-            add(vi1);
-            //add(confirm);
-
-
-
+            add(vi);
             repaint();
 
         }).start();
 
 
-
-       // button.addActionListener(event -> {
-
-            //     chromeOptions.addArguments("C:\\Users\\USER\\AppData\\Local\\Google\\Chrome\\User Data\\Default");
-        //    driver.get("https://web.whatsapp.com");
-            var ref = new Object() {
-                boolean flag = false;
-            };
             Thread thread = new Thread( () -> {
-                // while (!ref.flag) {
-                //  List<WebElement> elementList = driver.findElements(By.linkText("ניתן להוריד אותה כאן"));
-                //    for (int i = 0; i < elementList.size(); i++) {
-                //      if (elementList.get(i).isDisplayed()) {
-                //        ref.flag =true;
-                //  }
-                //   }
-                /// }
+
                 //JOptionPane.showMessageDialog(null,"ההתחברות בוצעה בהצלחה (:","title",JOptionPane.INFORMATION_MESSAGE);
 
                 AtomicBoolean valid = new AtomicBoolean(false);
@@ -127,12 +97,13 @@ public class OpenWindow extends JPanel {
 
                     }
                     if (number.charAt(0) == '0') {
-                        number = "972" + number.substring(1, number.length());
+                        number = "972" + number.substring(1);
                         valid.set(true);
                     }
                     if (ifValid(number)) {
                         valid.set(true);
                     }
+
 
                     if (valid.get()) {
                         String finalNumber = number;
@@ -142,7 +113,30 @@ public class OpenWindow extends JPanel {
                         driver.manage().window().maximize();
                         driver.get("https://web.whatsapp.com/send?phone=" + finalNumber);
                         driver.manage().window().maximize();
-                        // sendMessage(driver,text);
+                        var ref = new Object() {
+                            boolean ifHave = false;
+                        };
+                        Thread errorT = new Thread(() ->{
+                            while (!ref.ifHave)
+                            try {
+                                WebElement error = driver.findElement(By.className("_2Nr6U"));
+                                if (error.isDisplayed()){
+                                    System.out.println("error");
+                                    ref.ifHave =true;
+                                    WebElement clickError = driver.findElement(By.cssSelector("div[role='button'][tabindex='0']"));
+                                    clickError.click();
+                                    add(this.error);
+                                    repaint();
+
+                                }
+
+                            } catch (Exception e){
+
+                            }
+
+                        });errorT.start();
+
+
                         while (trySend) {
                             try {
                                 WebElement userName = driver.findElement(By.cssSelector("div[title=\"הקלדת ההודעה\"]"));
@@ -166,9 +160,7 @@ public class OpenWindow extends JPanel {
                         List<WebElement> allMessage = chatBody.findElements(By.className("_22Msk"));
                         WebElement lastMessage = allMessage.get(allMessage.size() - 1);
                         AtomicBoolean flag = new AtomicBoolean(true);
-                        var ref1 = new Object() {
-                            boolean ifSend = false;
-                        };
+
                         new Thread(() -> {
                             WebElement status;
                             String statusMessage= " ";
@@ -180,7 +172,7 @@ public class OpenWindow extends JPanel {
                                          statusMessage = status.getAttribute("aria-label");
                                         if (statusMessage.equals(" נשלחה ")) {
                                             System.out.println("נשלחה");
-                                            vi1.setText("V");
+                                            vi.setText("V");
                                             repaint();
                                             ifSend = true;
                                         }
@@ -192,13 +184,14 @@ public class OpenWindow extends JPanel {
 
                                     if (statusMessage.equals(" נמסרה ")) {
                                         System.out.println("נמסרה");
-                                        vi1.setText("VV");
+                                        add(vi);
+                                        vi.setText("VV");
                                         repaint();
                                     }
                                     if (statusMessage.equals(" נקראה ")) {
                                         System.out.println("נקראה");
-                                        vi1.setText("VV");
-                                        vi1.setForeground(Color.blue);
+                                        vi.setText("VV");
+                                        vi.setForeground(Color.blue);
                                         repaint();
                                         flag.set(false);
                                     }
@@ -208,8 +201,27 @@ public class OpenWindow extends JPanel {
 
                                 }
                             }
-                            WebElement comment = driver.findElement(By.xpath("//*[@id=\"main\"]/div[3]/div/div[2]/div[3]/div[47]/div/div[1]/div[1]/div[1]/div/span[1]/span"));
-                            System.out.println(comment.getText());
+                            try {
+                                while (true){
+                                    List <WebElement> comment = driver.findElements(By.cssSelector("div[tabindex = '-1'][role = 'region']"));
+                                    for (int i=0; i< comment.size(); i++){
+                                        String mes = comment.get(i).getText();
+                                        mes.split("הודעה 1 שלא נקראה");
+                                        System.out.println(mes);
+                                        System.out.println(comment.get(i).getText()+  "i:" +i + "size:" + comment.size());
+                                        String last = comment.get(comment.size()-1).getAttribute("aria-label");
+                                      //  System.out.println(last);
+                                        Thread.sleep(10000);
+                                    }
+
+
+                                }
+
+
+                            }catch (Exception e){
+
+                            }
+
                         }).start();
 
 
@@ -224,14 +236,7 @@ public class OpenWindow extends JPanel {
 
 
     }
-    public Component printVi (Color color, String vi){
-        JLabel label = new JLabel(vi);
-        label.setBackground(color);
-        this.blueVi.setBounds(300,380,70,40);
-        this.blueVi.setFont(new Font("TimesRoman", Font.BOLD, 15));
 
-        return label;
-    }
 
     public void sendMessage(ChromeDriver driver, String message){
         while (trySend){
